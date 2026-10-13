@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mail_tracking_service/router.dart';
 import 'package:mail_tracking_service/screens/login_screen.dart';
 
 void main() {
@@ -10,11 +11,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: LoginScreen(),
-      ),
     );
   }
 }
