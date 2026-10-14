@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mail_tracking_service/widgets/authentication_scaffold.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mail_tracking_service/widgets/form_input_field.dart';
+import 'package:mail_tracking_service/theme/app_colors.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -21,8 +22,15 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  bool _obscurePassword = true;
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,141 +48,64 @@ class _LoginFormState extends State<LoginForm> {
                 "Вхід у PosTrack",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF171C20)
+                    color: AppColors.textPrimary,
                 ),
               ),
               const Text(
                   "Введіть дані для доступу до ваших посилок",
                   style: TextStyle(
-                      color: Color(0xFF171C20)
+                      color: AppColors.textPrimary,
                   )
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 4,
-            children: [
-              Text.rich(
-                TextSpan(
-                  text: 'Email ',
-                  children: [
-                    TextSpan(text: '*', style: TextStyle(color: Colors.red)),
-                  ],
-                ),
-              ),
-              TextFormField(
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Введіть email';
-                  }
+          FormInputField(
+            label: "Email",
+            hint: "oleg@example.com",
+            type: FieldType.email,
+            controller: _emailController,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Введіть email';
+              }
 
-                  if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-                      .hasMatch(value.trim())) {
-                    return 'Введіть коректний email';
-                  }
+              if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                  .hasMatch(value.trim())) {
+                return 'Введіть коректний email';
+              }
 
-                  return null;
-                },
-                decoration: InputDecoration(
-                    labelText: "oleg@example.com",
-                    labelStyle: TextStyle(color: const Color(0xFF5B5F64)),
-                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
-                        borderSide: BorderSide(color: const Color(0xFFC1C6D6))
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFC1C6D6)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFF1A73E8),
-                        width: 1.5,
-                      ),
-                    ),
-                ),
-              )
-            ],
+              return null;
+            },
+            labelTrailing: null,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 4,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      text: 'Пароль ',
-                      children: [
-                        TextSpan(text: '*', style: TextStyle(color: Colors.red)),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
+          FormInputField(
+            label: "Пароль",
+            hint: "······",
+            type: FieldType.password,
+            controller: _passwordController,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Введіть пароль';
+              }
 
-                    },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      "Забули пароль?",
-                      style: TextStyle(
-                        color: Color(0xFF005BBF),
-                      ),
-                    ),
-                  )
-                ],
+              return null;
+            },
+            labelTrailing: TextButton(
+              onPressed: () {
+                context.push('/forgot-pass');
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              TextFormField(
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Введіть пароль';
-                  }
-
-                  return null;
-                },
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                    labelText: "······",
-                    labelStyle: TextStyle(color: const Color(0xFF5B5F64)),
-                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
-                        borderSide: BorderSide(color: const Color(0xFFC1C6D6))
-                    ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFC1C6D6)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF1A73E8),
-                      width: 1.5,
-                    ),
-                  ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                    ),
-                  ),
+              child: Text(
+                "Забули пароль?",
+                style: TextStyle(
+                  color: AppColors.link,
                 ),
-              )
-            ],
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -183,7 +114,7 @@ class _LoginFormState extends State<LoginForm> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF1A73E8),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(
@@ -193,7 +124,7 @@ class _LoginFormState extends State<LoginForm> {
             child: const Text("Увійти"),
           ),
           const Divider(
-            color: Color(0x4DC1C6D6),
+            color: AppColors.border,
             thickness: 1,
             height: 24,
           ),
@@ -204,12 +135,12 @@ class _LoginFormState extends State<LoginForm> {
               Text(
                 "Ще немає акаунту?",
                 style: TextStyle(
-                  color: Color(0xFF414754)
+                  color: AppColors.textSecondary,
                 ),
               ),
               TextButton(
                 onPressed: () {
-
+                  context.push('/register');
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
@@ -219,7 +150,7 @@ class _LoginFormState extends State<LoginForm> {
                 child: Text(
                   "Реєстрація",
                   style: TextStyle(
-                    color: Color(0xFF005BBF),
+                    color: AppColors.link,
                   ),
                 ),
               )
