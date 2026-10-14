@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mail_tracking_service/widgets/authentication_scaffold.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mail_tracking_service/widgets/form_input_field.dart';
+import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/theme/app_colors.dart';
+import 'package:mail_tracking_service/widgets/form_title.dart';
+import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
+import 'package:mail_tracking_service/utils/validators.dart';
+import 'package:mail_tracking_service/widgets/bottom_redirection.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -40,42 +45,16 @@ class _LoginFormState extends State<LoginForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 12,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 4,
-            children: [
-              const Text(
-                "Вхід у PosTrack",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                ),
-              ),
-              const Text(
-                  "Введіть дані для доступу до ваших посилок",
-                  style: TextStyle(
-                      color: AppColors.textPrimary,
-                  )
-              ),
-            ],
+          FormTitle(
+            mainText: "Вхід у PosTrack",
+            subText: "Введіть дані для доступу до ваших посилок",
           ),
           FormInputField(
             label: "Email",
             hint: "oleg@example.com",
             type: FieldType.email,
             controller: _emailController,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Введіть email';
-              }
-
-              if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-                  .hasMatch(value.trim())) {
-                return 'Введіть коректний email';
-              }
-
-              return null;
-            },
+            validator: (value) => Validators.validateEmail(value),
             labelTrailing: null,
           ),
           FormInputField(
@@ -83,78 +62,32 @@ class _LoginFormState extends State<LoginForm> {
             hint: "······",
             type: FieldType.password,
             controller: _passwordController,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Введіть пароль';
-              }
-
-              return null;
-            },
-            labelTrailing: TextButton(
-              onPressed: () {
-                context.push('/forgot-pass');
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                "Забули пароль?",
-                style: TextStyle(
-                  color: AppColors.link,
-                ),
-              ),
+            validator: (value) => Validators.validatePassword(value),
+            labelTrailing: NavTextButton(
+              destination: '/forgot-pass',
+              label: 'Забули пароль?',
             ),
           ),
-          ElevatedButton(
+          FormActionButton(
+            label: 'Увійти',
             onPressed: () {
               if (_formKey.currentState!.validate()) {
+                final email = _emailController.text.trim();
+                final password = _passwordController.text;
+
 
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12))
-                ),
-            ),
-            child: const Text("Увійти"),
           ),
           const Divider(
             color: AppColors.border,
             thickness: 1,
             height: 24,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 4,
-            children: [
-              Text(
-                "Ще немає акаунту?",
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  context.push('/register');
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  "Реєстрація",
-                  style: TextStyle(
-                    color: AppColors.link,
-                  ),
-                ),
-              )
-            ],
+          BottomRedirection(
+            textLabel: "Ще немає акаунту?",
+            buttonLabel: "Реєстрація",
+            onPressed: () => context.push('/register'),
           )
         ],
       ),
