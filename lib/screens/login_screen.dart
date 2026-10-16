@@ -70,14 +70,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           FormActionButton(
             label: 'Увійти',
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                final email = _emailController.text.trim();
-                final password = _passwordController.text;
-
-
-              }
-            },
+            onPressed: () => context.go('/home'),
           ),
           const Divider(
             color: AppColors.border,
