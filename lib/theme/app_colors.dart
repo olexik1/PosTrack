@@ -11,4 +11,6 @@ class AppColors {
   static const hint = Color(0xFF5B5F64);
   static const link = Color(0xFF005BBF);
   static const error = Color(0xFFBA1A1A);
+  static const avatar = Color(0xFFD8E2FF);
+  static const photoButton = Color(0xFFF0F4FA);
 }

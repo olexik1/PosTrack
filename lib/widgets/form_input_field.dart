@@ -11,6 +11,8 @@ class FormInputField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool isRequired;
   final Widget? labelTrailing;
+  final Color? fillColor;
+  final bool enabled;
 
   const FormInputField({
     super.key,
@@ -21,6 +23,8 @@ class FormInputField extends StatefulWidget {
     this.validator,
     this.isRequired = true,
     this.labelTrailing,
+    this.fillColor,
+    this.enabled = true,
   });
 
   @override
@@ -77,12 +81,16 @@ class _FormInputFieldState extends State<FormInputField> {
           validator: widget.validator,
           obscureText: _obscure,
           keyboardType: keyboard,
+          enabled: widget.enabled,
           decoration: InputDecoration(
             hintText: widget.hint,
+            filled: widget.fillColor != null,
+            fillColor: widget.fillColor,
             hintStyle: const TextStyle(color: AppColors.hint),
             border: _border(AppColors.border),
             enabledBorder: _border(AppColors.border),
             focusedBorder: _border(AppColors.primary, 1.5),
+            disabledBorder: _border(AppColors.border),
             suffixIcon: widget.type == FieldType.password
                 ? IconButton(
               onPressed: () => setState(() => _obscure = !_obscure),

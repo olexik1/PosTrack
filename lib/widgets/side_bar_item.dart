@@ -17,21 +17,26 @@ class SideBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      selected: selected,
-      selectedTileColor: AppColors.primary,
-      tileColor: Colors.transparent,
-      leading: Icon(
-        icon,
-        color: selected ? Color(0xFFFFFFFF) : AppColors.textSecondary,
+    return Material(
+      color: selected ? AppColors.primary : Colors.transparent,
+      borderRadius: BorderRadius.circular(8),
+      child: ListTile(
+        selected: selected,
+        leading: Icon(
+          icon,
+          color: selected ? Colors.white : AppColors.textSecondary,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.white : AppColors.textSecondary,
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        onTap: onTap,
       ),
-      title: Text(label, style: TextStyle(
-          color: selected ? Color(0xFFFFFFFF) : AppColors.textSecondary
-      )),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      onTap: onTap,
     );
   }
 }

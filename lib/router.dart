@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:mail_tracking_service/widgets/main_shell.dart';
 import 'package:mail_tracking_service/screens/home_screen.dart';
 import 'package:mail_tracking_service/screens/profile_screen.dart';
+import 'package:mail_tracking_service/screens/change_password_screen.dart';
 
 // Навігація по різних сторінках застосунку
 final router = GoRouter(
@@ -25,6 +26,7 @@ final router = GoRouter(
           builder: (c, s) => const Center(child: Text('Мої посилки: скоро')),
         ),
         GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
+        GoRoute(path: '/change-pass', builder: (c, s) => const ChangePasswordScreen()),
         GoRoute(
           path: '/help',
           builder: (c, s) => const Center(child: Text('Довідка: скоро')),

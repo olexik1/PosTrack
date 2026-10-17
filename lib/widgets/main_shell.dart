@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mail_tracking_service/widgets/side_bar_item.dart';
 import 'package:mail_tracking_service/theme/app_colors.dart';
-
+import 'package:mail_tracking_service/widgets/app_header.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -22,10 +22,12 @@ class MainShell extends StatelessWidget {
     final selectedIndex = _selectedIndex(location);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: Row(
         children: [
-          SizedBox(
-            width: 250,
+          Container(
+            width: 300,
+            color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -42,35 +44,54 @@ class MainShell extends StatelessWidget {
                     ),
                   ),
                 ),
-                SideBarItem(
-                  icon: Icons.home_outlined,
-                  label: "Головна",
-                  selected: (0 == selectedIndex),
-                  onTap: () => context.go("/home"),
-                ),
-                SideBarItem(
-                  icon: Icons.inventory_2_outlined,
-                  label: "Мої посилки",
-                  selected: (1 == selectedIndex),
-                  onTap: () => context.go("/parcels"),
-                ),
-                SideBarItem(
-                  icon: Icons.person_outline,
-                  label: "Профіль",
-                  selected: (2 == selectedIndex),
-                  onTap: () => context.go("/profile"),
-                ),
-                SideBarItem(
-                  icon: Icons.help_outline,
-                  label: "Довідка",
-                  selected: (3 == selectedIndex),
-                  onTap: () => context.go("/help"),
-                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                  ),
+                  child: Column(
+                    children: [
+                      SideBarItem(
+                        icon: Icons.home_outlined,
+                        label: "Головна",
+                        selected: (0 == selectedIndex),
+                        onTap: () => context.go("/home"),
+                      ),
+                      SideBarItem(
+                        icon: Icons.inventory_2_outlined,
+                        label: "Мої посилки",
+                        selected: (1 == selectedIndex),
+                        onTap: () => context.go("/parcels"),
+                      ),
+                      SideBarItem(
+                        icon: Icons.person_outline,
+                        label: "Профіль",
+                        selected: (2 == selectedIndex),
+                        onTap: () => context.go("/profile"),
+                      ),
+                      SideBarItem(
+                        icon: Icons.help_outline,
+                        label: "Довідка",
+                        selected: (3 == selectedIndex),
+                        onTap: () => context.go("/help"),
+                        ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),
-          const VerticalDivider(width: 1),
-          Expanded(child: child),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppHeader(
+                  name: 'Олег',
+                  onLogout: () => context.go('/login'),
+                ),
+                Expanded(child: child),
+              ],
+            ),
+          ),
         ],
       ),
     );
