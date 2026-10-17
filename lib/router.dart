@@ -26,7 +26,7 @@ final router = GoRouter(
           builder: (c, s) => const Center(child: Text('Мої посилки: скоро')),
         ),
         GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
-        GoRoute(path: '/change-pass', builder: (c, s) => const ChangePasswordScreen()),
+        GoRoute(path: '/profile/change-password', builder: (c, s) => const ChangePasswordScreen()),
         GoRoute(
           path: '/help',
           builder: (c, s) => const Center(child: Text('Довідка: скоро')),

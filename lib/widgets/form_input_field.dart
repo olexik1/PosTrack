@@ -13,6 +13,7 @@ class FormInputField extends StatefulWidget {
   final Widget? labelTrailing;
   final Color? fillColor;
   final bool enabled;
+  final double? fieldHeight;
 
   const FormInputField({
     super.key,
@@ -25,6 +26,7 @@ class FormInputField extends StatefulWidget {
     this.labelTrailing,
     this.fillColor,
     this.enabled = true,
+    this.fieldHeight,
   });
 
   @override
@@ -38,6 +40,20 @@ class _FormInputFieldState extends State<FormInputField> {
   void initState() {
     super.initState();
     _obscure = widget.type == FieldType.password;
+  }
+
+  Icon? getInputIcon() {
+    if(!widget.enabled) {
+      return Icon(Icons.lock_outline);
+    } else if(widget.type == FieldType.password) {
+      return Icon(
+        _obscure
+            ? Icons.visibility_off_outlined
+            : Icons.visibility_outlined,
+      );
+    } else {
+      return null;
+    }
   }
 
   OutlineInputBorder _border(Color color, [double width = 1]) {
@@ -91,16 +107,12 @@ class _FormInputFieldState extends State<FormInputField> {
             enabledBorder: _border(AppColors.border),
             focusedBorder: _border(AppColors.primary, 1.5),
             disabledBorder: _border(AppColors.border),
-            suffixIcon: widget.type == FieldType.password
-                ? IconButton(
-              onPressed: () => setState(() => _obscure = !_obscure),
-              icon: Icon(
-                _obscure
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-              ),
-            )
-                : null,
+            constraints: widget.fieldHeight != null
+                ? BoxConstraints(
+                minHeight: widget.fieldHeight!,
+                maxHeight: widget.fieldHeight!,
+              ) : null,
+            suffixIcon: getInputIcon(),
           ),
         ),
       ],

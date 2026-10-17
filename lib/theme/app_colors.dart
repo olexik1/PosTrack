@@ -13,4 +13,8 @@ class AppColors {
   static const error = Color(0xFFBA1A1A);
   static const avatar = Color(0xFFD8E2FF);
   static const photoButton = Color(0xFFF0F4FA);
+  static const disabledInput = Color(0xFFE4E9EE);
+  static const passBackground = Color(0xFFEAEEF4);
+  static const exit = Color(0xFFBA1A1A);
+  static const exitBackground = Color(0xFFFFDAD6);
 }
