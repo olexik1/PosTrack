@@ -19,6 +19,8 @@ class AppColors {
   static const exit = Color(0xFFBA1A1A);
   static const exitBackground = Color(0xFFFFDAD6);
   static const cardBorder = Color(0xFFE2E8F0);
+  static const parcelInput = Color(0xFF9CA3AF);
+  static const parcelInputBorder = Color(0xFFE2E8F0);
 
   // Кольори для статусів посилок
   static const statusCreatedText = Color(0xFF5B5F64);

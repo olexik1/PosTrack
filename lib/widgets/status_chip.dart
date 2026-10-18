@@ -16,12 +16,16 @@ class StatusChip extends StatelessWidget {
           color: status.backgroundColor,
         borderRadius: BorderRadius.circular(6),
       ),
+      padding: EdgeInsets.symmetric(
+        vertical: 2,
+        horizontal: 8,
+      ),
       child: Text(
         status.label,
         style: TextStyle(
           color: status.textColor,
             fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
         ),
       ),
     );
