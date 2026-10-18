@@ -42,14 +42,17 @@ class _FormInputFieldState extends State<FormInputField> {
     _obscure = widget.type == FieldType.password;
   }
 
-  Icon? getInputIcon() {
+  Widget? getInputIcon() {
     if(!widget.enabled) {
       return Icon(Icons.lock_outline);
     } else if(widget.type == FieldType.password) {
-      return Icon(
-        _obscure
-            ? Icons.visibility_off_outlined
-            : Icons.visibility_outlined,
+      return IconButton(
+          onPressed: () => setState(() => _obscure = !_obscure),
+          icon: Icon(
+            _obscure
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
+          ),
       );
     } else {
       return null;
