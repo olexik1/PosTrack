@@ -5,6 +5,7 @@ class FormActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool fullWidth;
   final IconData? icon;
+  final bool isLoading;
 
   const FormActionButton({
     super.key,
@@ -12,6 +13,7 @@ class FormActionButton extends StatelessWidget {
     required this.onPressed,
     this.fullWidth = true,
     this.icon,
+    this.isLoading = false,
   });
 
   @override
@@ -19,19 +21,19 @@ class FormActionButton extends StatelessWidget {
     return SizedBox(
       width: fullWidth ? double.infinity : null,
       child: (icon == null) ? ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           minimumSize: Size(fullWidth ? double.infinity : 0, 48),
           padding: const EdgeInsets.symmetric(horizontal: 24),
         ),
-        child: Text(label),
+        child: isLoading ? const CircularProgressIndicator() : Text(label),
       ) : ElevatedButton.icon(
-          onPressed: onPressed,
+          onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
             minimumSize: Size(fullWidth ? double.infinity : 0, 48),
             padding: const EdgeInsets.symmetric(horizontal: 24),
           ),
-          label: Text(label),
+          label: isLoading ? const CircularProgressIndicator() : Text(label),
           icon: Icon(icon, color: Colors.white),
       ),
     );

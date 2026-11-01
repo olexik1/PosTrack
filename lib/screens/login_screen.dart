@@ -8,6 +8,9 @@ import 'package:mail_tracking_service/widgets/form_title.dart';
 import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
 import 'package:mail_tracking_service/utils/validators.dart';
 import 'package:mail_tracking_service/widgets/bottom_redirection.dart';
+import 'package:mail_tracking_service/exceptions/auth_exception.dart';
+import 'package:mail_tracking_service/services/auth_repository.dart';
+import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -29,6 +32,8 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AuthRepository _authRepository = AuthRepository();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -56,6 +61,7 @@ class _LoginFormState extends State<LoginForm> {
             controller: _emailController,
             validator: (value) => Validators.validateEmail(value),
             labelTrailing: null,
+            enabled: !_isLoading,
           ),
           FormInputField(
             label: "Пароль",
@@ -67,10 +73,50 @@ class _LoginFormState extends State<LoginForm> {
               destination: '/forgot-pass',
               label: 'Забули пароль?',
             ),
+            enabled: !_isLoading,
           ),
           FormActionButton(
             label: 'Увійти',
-            onPressed: () => context.go('/home'),
+              isLoading: _isLoading,
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                final email = _emailController.text.trim();
+                final password = _passwordController.text;
+
+                try {
+                  setState(() {
+                    _isLoading = true;
+                  });
+
+                  await _authRepository.signIn(email: email, password: password);
+
+                  if (!context.mounted) return;
+                  context.go('/home');
+                } on AuthException catch(e) {
+                  if(!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    AppSnackBar.error(e.translateFirebaseException()),
+                  );
+                } catch (e) {
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'),
+                  );
+                } finally {
+                  if (context.mounted) {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  }
+                }
+              }
+            },
           ),
           const Divider(
             color: AppColors.border,

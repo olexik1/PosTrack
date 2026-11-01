@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1098668181870",
+    "project_id": "postrack-9e70c",
+    "storage_bucket": "postrack-9e70c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1098668181870:android:60da61427f479f2271197f",
+        "android_client_info": {
+          "package_name": "com.example.mail_tracking_service"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKbddZhXDyGqgV0G_5-73emyTxQiun6Ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -8,6 +8,9 @@ import 'package:mail_tracking_service/widgets/main_shell.dart';
 import 'package:mail_tracking_service/screens/home_screen.dart';
 import 'package:mail_tracking_service/screens/profile_screen.dart';
 import 'package:mail_tracking_service/screens/change_password_screen.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+
+final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
 // Навігація по різних сторінках застосунку
 final router = GoRouter(
@@ -36,3 +39,26 @@ final router = GoRouter(
   ],
 );
 
+String? _lastScreen;
+
+void setupAnalyticsTracking() {
+  router.routerDelegate.addListener(() {
+    final currentPath =
+    router.routerDelegate.currentConfiguration.uri.toString();
+
+    if (currentPath == _lastScreen) return;
+
+    _lastScreen = currentPath;
+
+    analytics.logEvent(
+      name: 'screen_view',
+      parameters: {
+        'firebase_screen': currentPath,
+        'firebase_screen_class': currentPath,
+        'debug_mode': 1,
+      },
+    );
+
+    debugPrint('Analytics screen_view: $currentPath');
+  });
+}

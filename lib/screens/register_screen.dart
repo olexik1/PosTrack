@@ -5,9 +5,11 @@ import 'package:mail_tracking_service/widgets/form_input_field.dart';
 import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/theme/app_colors.dart';
 import 'package:mail_tracking_service/widgets/form_title.dart';
-import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
 import 'package:mail_tracking_service/utils/validators.dart';
 import 'package:mail_tracking_service/widgets/bottom_redirection.dart';
+import 'package:mail_tracking_service/exceptions/auth_exception.dart';
+import 'package:mail_tracking_service/services/auth_repository.dart';
+import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
 
 
 class RegisterScreen extends StatelessWidget {
@@ -32,6 +34,8 @@ class _RegisterFormState extends State<RegisterForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
+  final AuthRepository _authRepository = AuthRepository();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -60,6 +64,7 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: _nameController,
             validator: (value) => Validators.validateRequired(value),
             labelTrailing: null,
+            enabled: !_isLoading,
           ),
           FormInputField(
             label: "Email",
@@ -68,6 +73,7 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: _emailController,
             validator: (value) => Validators.validateEmail(value),
             labelTrailing: null,
+            enabled: !_isLoading,
           ),
           FormInputField(
             label: "Пароль",
@@ -76,28 +82,59 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: _passwordController,
             validator: (value) => Validators.validatePassword(value),
             labelTrailing: null,
+            enabled: !_isLoading,
           ),
           FormInputField(
             label: "Підтвердіть пароль",
             hint: "······",
             type: FieldType.password,
             controller: _confirmPasswordController,
-            validator: (value) {
-              if (value != _passwordController.text) {
-                return 'Паролі не збігаються';
-              }
-              return null;
-            },
+            validator: Validators.validateConfirm(_passwordController),
             labelTrailing: null,
+            enabled: !_isLoading,
           ),
           FormActionButton(
             label: 'Зареєструватися',
-            onPressed: () {
+            isLoading: _isLoading,
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 final email = _emailController.text.trim();
                 final password = _passwordController.text;
+                final name = _nameController.text.trim();
 
+                try {
+                  setState(() {
+                    _isLoading = true;
+                  });
 
+                  await _authRepository.signUp(email: email, password: password,
+                      name: name);
+
+                  if (!context.mounted) return;
+                  context.go('/home');
+                } on AuthException catch(e) {
+                  if(!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    AppSnackBar.error(e.translateFirebaseException()),
+                  );
+                } catch (e) {
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'),
+                  );
+                } finally {
+                  if (context.mounted) {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  }
+                }
               }
             },
           ),
