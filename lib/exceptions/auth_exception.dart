@@ -33,6 +33,15 @@ class AuthException implements Exception {
       case 'wrong-password':
         displayMessage = 'Введено неправильний пароль для цього користувача';
         break;
+      case 'invalid-credential':
+        displayMessage = 'Неправильна електронна пошта або пароль';
+        break;
+      case 'wrong-current-password':
+        displayMessage = 'Неправильний поточний пароль';
+        break;
+      case 'requires-recent-login':
+        displayMessage = 'Для цієї дії потрібно повторно увійти в акаунт';
+        break;
       default:
         displayMessage = 'Не вдалося виконати операцію. Спробуйте ще раз';
         break;

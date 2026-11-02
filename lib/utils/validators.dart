@@ -33,11 +33,9 @@ class Validators {
     return null;
   }
 
-  static String? Function(String?) validateConfirm(TextEditingController password) {
-    return (value) {
-      if (value == null || value.isEmpty) return 'Підтвердіть пароль';
-      if (value != password.text) return 'Паролі не збігаються';
-      return null;
-    };
+  static String? validateConfirm(String? v, TextEditingController password) {
+    if (v == null || v.isEmpty) return 'Підтвердіть пароль';
+    if (v != password.text) return 'Паролі не збігаються';
+    return null;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mail_tracking_service/router.dart';
 import 'package:mail_tracking_service/theme/app_theme.dart';
@@ -27,6 +28,8 @@ Future<void> main() async {
             'debug_mode': 1,
           },
         );
+
+        await FirebaseAuth.instance.authStateChanges().first;
 
         setupAnalyticsTracking();
         runApp(const MyApp());

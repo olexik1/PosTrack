@@ -76,7 +76,8 @@ class _PasswordRecoveryFormState extends State<PasswordRecoveryForm> {
                   await _authRepository.sendPasswordReset(email: email);
 
                   if (!context.mounted) return;
-                  context.go('/letter-sent');
+                  context.go(Uri(path: '/letter-sent',
+                      queryParameters: {'email': email}).toString());
                 } on AuthException catch(e) {
                   if(!context.mounted) return;
 

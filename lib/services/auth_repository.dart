@@ -4,12 +4,12 @@ import 'package:mail_tracking_service/exceptions/auth_exception.dart';
 class AuthRepository {
   Future<void> signUp({required String email, required String password, required String name}) async {
     try {
-      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password
       );
 
-      User? user = credential.user;
+      User? user = currentUser;
 
       if(user != null) {
         await user.updateDisplayName(name);
@@ -25,7 +25,7 @@ class AuthRepository {
 
   Future<void> signIn({required String email, required String password}) async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: password
       );
@@ -38,7 +38,7 @@ class AuthRepository {
 
   Future<void> sendPasswordReset({required String email}) async {
     try {
-      final credential = await FirebaseAuth.instance.sendPasswordResetEmail(
+      await FirebaseAuth.instance.sendPasswordResetEmail(
           email: email
       );
     } on FirebaseAuthException catch (e) {
@@ -48,21 +48,65 @@ class AuthRepository {
     }
   }
 
-  Future<void> changePassword({required String email, required String password}) async {
-
-  }
-
-  Future<void> updateName({required String email, required String password}) async {
-
-  }
-
-  Future<void> updatePhoto({required String email, required String password}) async {
-
-  }
+  User? get currentUser => FirebaseAuth.instance.currentUser;
+  Stream<User?> get userChanges => FirebaseAuth.instance.userChanges();
+  Stream<User?> get authStateChanges => FirebaseAuth.instance.authStateChanges();
 
   Future<void> signOut() async {
-
+    await FirebaseAuth.instance.signOut();
   }
 
-  // authStateChanges()
+  Future<void> updateName({required String name}) async {
+    try {
+      await currentUser?.updateDisplayName(name);
+      await currentUser?.reload();
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(errorCode: e.code);
+    } catch (e) {
+      throw AuthException(errorCode: 'Не вдалося виконати операцію. Спробуйте ще раз');
+    }
+  }
+
+  Future<void> updatePhoto({String? photoUrl}) async {
+    try {
+      await currentUser?.updatePhotoURL(photoUrl ?? '');
+      await currentUser?.reload();
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(errorCode: e.code);
+    } catch (e) {
+      throw const AuthException(
+        errorCode: 'Не вдалося виконати операцію. Спробуйте ще раз',
+      );
+    }
+  }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = currentUser;
+    final email = user?.email;
+
+    if (user == null || email == null) {
+      throw const AuthException(errorCode: 'requires-recent-login');
+    }
+
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: currentPassword,
+      );
+      await user.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential' || e.code == 'wrong-password') {
+        throw const AuthException(errorCode: 'wrong-current-password');
+      }
+      throw AuthException(errorCode: e.code);
+    } catch (e) {
+      throw const AuthException(
+        errorCode: 'Не вдалося виконати операцію. Спробуйте ще раз',
+      );
+    }
+  }
 }

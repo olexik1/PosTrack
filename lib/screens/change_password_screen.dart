@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
 import 'package:mail_tracking_service/widgets/form_input_field.dart';
 import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/theme/app_colors.dart';
+import 'package:mail_tracking_service/services/auth_repository.dart';
+import 'package:mail_tracking_service/exceptions/auth_exception.dart';
+import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
+import 'package:mail_tracking_service/utils/validators.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -12,22 +17,22 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  String password = "676767";
-  String newPassword = "767676";
-  String confPassword = "767676";
+  final AuthRepository _authRepository = AuthRepository();
 
   late TextEditingController _passwordController;
   late TextEditingController _newPasswordController;
   late TextEditingController _confPasswordController;
+
+  bool _isLoading = false;
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    _passwordController = TextEditingController(text: password);
-    _newPasswordController = TextEditingController(text: newPassword);
-    _confPasswordController = TextEditingController(text: confPassword);
+    _passwordController = TextEditingController();
+    _newPasswordController = TextEditingController();
+    _confPasswordController = TextEditingController();
   }
 
   @override
@@ -99,6 +104,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       fillColor: AppColors.photoButton,
                       fieldHeight: 56,
                       isRequired: true,
+                      validator: (v) => Validators.validateRequired(v),
+                      enabled: !_isLoading,
                     ),
                     FormInputField(
                       hint: "******",
@@ -108,6 +115,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       fillColor: AppColors.photoButton,
                       fieldHeight: 56,
                       isRequired: true,
+                      validator: (v) => Validators.validatePassword(v),
+                      enabled: !_isLoading,
                     ),
                     FormInputField(
                       hint: "******",
@@ -117,19 +126,72 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       fillColor: AppColors.photoButton,
                       fieldHeight: 56,
                       isRequired: true,
+                      validator: (v) => Validators.validateConfirm(v, _newPasswordController),
+                      enabled: !_isLoading,
                     ),
                     Row(
                       spacing: 8,
                       children: [
                         FormActionButton(
                           label: "Змінити пароль",
-                          onPressed: () {},
+                          isLoading: _isLoading,
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              final currentPassword = _passwordController.text;
+                              final newPassword = _newPasswordController.text;
+
+                              try {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+
+                                await _authRepository.changePassword(
+                                    currentPassword: currentPassword,
+                                    newPassword: newPassword
+                                );
+
+                                if (!context.mounted) return;
+
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  AppSnackBar.success('Пароль змінено'),
+                                );
+
+                                if(!context.mounted) return;
+                                context.go('/profile');
+                              } on AuthException catch(e) {
+                                if(!context.mounted) return;
+
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  AppSnackBar.error(e.translateFirebaseException()),
+                                );
+                              } catch (e) {
+                                if (!context.mounted) return;
+
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'),
+                                );
+                              } finally {
+                                if (context.mounted) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                }
+                              }
+                            }
+                          },
                           fullWidth: false,
                         ),
                         SizedBox(
                           height: 48,
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              context.go('/profile');
+                            },
                             child: const Text(
                               "Скасувати",
                               style: TextStyle(color: AppColors.hint),

@@ -9,6 +9,8 @@ import 'package:mail_tracking_service/screens/home_screen.dart';
 import 'package:mail_tracking_service/screens/profile_screen.dart';
 import 'package:mail_tracking_service/screens/change_password_screen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mail_tracking_service/utils/go_router_refresh_stream.dart';
 
 final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
@@ -19,7 +21,10 @@ final router = GoRouter(
     GoRoute(path: '/login', builder: (c, s) => const LoginScreen()),
     GoRoute(path: '/register', builder: (c, s) => const RegisterScreen()),
     GoRoute(path: '/forgot-pass', builder: (c, s) => const ForgotPasswordScreen()),
-    GoRoute(path: '/letter-sent', builder: (c, s) => const LetterSentScreen()),
+    GoRoute(
+      path: '/letter-sent',
+      builder: (c, s) => LetterSentScreen(email: s.uri.queryParameters['email']),
+    ),
     ShellRoute(
       builder: (c, s, child) => MainShell(child: child),
       routes: [
@@ -37,6 +42,16 @@ final router = GoRouter(
       ],
     ),
   ],
+  redirect: (context, state) {
+    final loggedIn = FirebaseAuth.instance.currentUser != null;
+    final path = state.matchedLocation;
+    const publicPaths = ['/login', '/register', '/forgot-pass', '/letter-sent'];
+
+    if (!loggedIn && !publicPaths.contains(path)) return '/login';
+    if (loggedIn && (path == '/login' || path == '/register')) return '/home';
+    return null;
+  },
+  refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
 );
 
 String? _lastScreen;

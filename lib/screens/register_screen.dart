@@ -89,7 +89,7 @@ class _RegisterFormState extends State<RegisterForm> {
             hint: "······",
             type: FieldType.password,
             controller: _confirmPasswordController,
-            validator: Validators.validateConfirm(_passwordController),
+            validator: (v) => Validators.validateConfirm(v, _passwordController),
             labelTrailing: null,
             enabled: !_isLoading,
           ),
@@ -146,7 +146,7 @@ class _RegisterFormState extends State<RegisterForm> {
           BottomRedirection(
             textLabel: "Вже маєте акаунт?",
             buttonLabel: "Вхід",
-            onPressed: () => context.push('/login'),
+            onPressed: () => context.go('/login'),
           )
         ],
       ),
