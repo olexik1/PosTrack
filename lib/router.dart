@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:mail_tracking_service/widgets/main_shell.dart';
 import 'package:mail_tracking_service/screens/home_screen.dart';
 import 'package:mail_tracking_service/screens/profile_screen.dart';
+import 'package:mail_tracking_service/screens/parcels_screen.dart';
 import 'package:mail_tracking_service/screens/change_password_screen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,7 +32,7 @@ final router = GoRouter(
         GoRoute(path: '/home', builder: (c, s) => const HomeScreen()),
         GoRoute(
           path: '/parcels',
-          builder: (c, s) => const Center(child: Text('Мої посилки: скоро')),
+          builder: (c, s) => const ParcelsScreen(),
         ),
         GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
         GoRoute(path: '/profile/change-password', builder: (c, s) => const ChangePasswordScreen()),

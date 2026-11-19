@@ -3,11 +3,9 @@ import 'package:mail_tracking_service/theme/app_colors.dart';
 import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/widgets/counter_card.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
-import 'package:mail_tracking_service/models/parcel.dart';
-import 'package:mail_tracking_service/models/parcel_carrier.dart';
 import 'package:mail_tracking_service/widgets/parcel_card.dart';
 import 'package:mail_tracking_service/models/parcel_repository.dart';
-import 'package:sentry/sentry.dart';
+// import 'package:sentry/sentry.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -143,7 +141,7 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 spacing: 8,
                 children: [
-                  for (final p in ParcelRepository.getAll()) ParcelCard(parcel: p, onDetails: (){},),
+                  for (final p in ParcelRepository.getRecent(3)) ParcelCard(parcel: p, onDetails: (){},),
                 ],
               ),
             )
