@@ -5,6 +5,7 @@ import 'package:mail_tracking_service/widgets/counter_card.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
 import 'package:mail_tracking_service/widgets/parcel_card.dart';
 import 'package:mail_tracking_service/models/parcel_repository.dart';
+import 'package:mail_tracking_service/widgets/filter_dropdown.dart';
 
 class ParcelsScreen extends StatelessWidget {
   const ParcelsScreen({super.key});
@@ -45,6 +46,18 @@ class ParcelsScreen extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.photoButton,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+
+                ],
+              ),
             ),
           ],
         ),

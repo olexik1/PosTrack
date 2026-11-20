@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mail_tracking_service/models/parcel_provider.dart';
 import 'package:mail_tracking_service/router.dart';
 import 'package:mail_tracking_service/theme/app_theme.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -42,10 +44,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      theme: AppTheme.light,
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
+    return ChangeNotifierProvider(
+      create: (_) => ParcelProvider(),
+      child: MaterialApp.router(
+        theme: AppTheme.light,
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

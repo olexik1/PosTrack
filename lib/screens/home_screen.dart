@@ -4,21 +4,19 @@ import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/widgets/counter_card.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
 import 'package:mail_tracking_service/widgets/parcel_card.dart';
-import 'package:mail_tracking_service/models/parcel_repository.dart';
+import 'package:mail_tracking_service/models/parcel_provider.dart';
+import 'package:mail_tracking_service/widgets/search_field.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 // import 'package:sentry/sentry.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  OutlineInputBorder _border(Color color, [double width = 1]) {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: color, width: width),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<ParcelProvider>();
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.symmetric(
@@ -43,36 +41,13 @@ class HomeScreen extends StatelessWidget {
                 const Spacer(),
                 SizedBox(
                   width: 300,
-                  child: TextField(
-                    textAlignVertical: TextAlignVertical.center,
-                    style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Пошук за ТТН або назвою",
-                      hintStyle: const TextStyle(
-                        color: AppColors.parcelInput,
-                        fontSize: 14,
-                      ),
-                      border: _border(AppColors.parcelInputBorder),
-                      enabledBorder: _border(AppColors.parcelInputBorder),
-                      focusedBorder: _border(AppColors.primary, 1.5),
-                      prefixIcon: const Padding(
-                        padding: EdgeInsets.only(left: 12, right: 8),
-                        child: Icon(
-                          Icons.search_outlined,
-                          color: AppColors.parcelInput,
-                          size: 20,
-                        ),
-                      ),
-                      prefixIconConstraints: const BoxConstraints(
-                        minWidth: 40,
-                        minHeight: 24,
-                      ),
-                      constraints: const BoxConstraints.tightFor(height: 48),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                    ),
-                  ),
+                  child: SearchField(
+                      value: provider.searchQuery,
+                      onChanged: provider.setSearchQuery,
+                      onSubmitted: (_) => context.go('/parcels'),
+                      color: Colors.white,
+                      hintColor: AppColors.parcelInput
+                  )
                 ),
                 const SizedBox(width: 8),
                 SizedBox(height: 48,
@@ -101,30 +76,14 @@ class HomeScreen extends StatelessWidget {
                 Row(
                   spacing: 8,
                   children: [
-                    Expanded(
-                      child: CounterCard(status: ParcelStatus.created,
-                          count: ParcelRepository.countStatus(ParcelStatus.created)),
-                    ),
-                    Expanded(
-                      child: CounterCard(status: ParcelStatus.accepted,
-                          count: ParcelRepository.countStatus(ParcelStatus.accepted)),
-                    ),
-                    Expanded(
-                      child: CounterCard(status: ParcelStatus.onTheRoad,
-                          count: ParcelRepository.countStatus(ParcelStatus.onTheRoad)),
-                    ),
-                    Expanded(
-                      child: CounterCard(status: ParcelStatus.arrived,
-                          count: ParcelRepository.countStatus(ParcelStatus.arrived)),
-                    ),
-                    Expanded(
-                      child: CounterCard(status: ParcelStatus.delivered,
-                          count: ParcelRepository.countStatus(ParcelStatus.delivered)),
-                    ),
-                    Expanded(
-                      child: CounterCard(status: ParcelStatus.returned,
-                          count: ParcelRepository.countStatus(ParcelStatus.returned)),
-                    ),
+                    for(final s in ParcelStatus.values) ...[
+                        Expanded(
+                          child: CounterCard(
+                            status: s,
+                            count: provider.countByStatus(s),
+                          ),
+                        ),
+                    ],
                   ],
                 ),
               ],
@@ -141,7 +100,7 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 spacing: 8,
                 children: [
-                  for (final p in ParcelRepository.getRecent(3)) ParcelCard(parcel: p, onDetails: (){},),
+                  for (final p in provider.recentParcels(3)) ParcelCard(parcel: p, onDetails: (){},),
                 ],
               ),
             )

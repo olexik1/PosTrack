@@ -141,4 +141,13 @@ class ParcelProvider extends ChangeNotifier {
       return false;
     }
   }
+
+  // Функції
+  int countByStatus(ParcelStatus status) {
+    return _parcels.where((p) => p.status == status).toList().length;
+  }
+
+  List<Parcel> recentParcels(int n) {
+    return _parcels.take(n).toList();
+  }
 }
