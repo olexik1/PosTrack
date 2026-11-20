@@ -17,36 +17,39 @@ class FilterDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 12,
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: AppColors.photoButton,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<T?>(
-              isExpanded: true,
-              value: value,
-              items: [
-                for (final e in options.entries)
-                  DropdownMenuItem<T?>(value: e.key, child: Text(e.value)),
-              ],
-              onChanged: onChanged,
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 4,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
             ),
           ),
-        ),
-      ],
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.photoButton,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<T?>(
+                isExpanded: true,
+                value: value,
+                items: [
+                  for (final e in options.entries)
+                    DropdownMenuItem<T?>(value: e.key, child: Text(e.value)),
+                ],
+                onChanged: onChanged,
+                dropdownColor: AppColors.photoButton,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

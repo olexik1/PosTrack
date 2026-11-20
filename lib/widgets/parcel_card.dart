@@ -78,7 +78,9 @@ class ParcelCard extends StatelessWidget {
                   runSpacing: 4,
                   children: [
                     _meta(Icons.tag, parcel.trackingNumber),
+                    _separator(),
                     _meta(Icons.local_shipping_outlined, parcel.carrier.label),
+                    _separator(),
                     _meta(
                       isCreated ? Icons.calendar_today_outlined : Icons.update,
                       dateText,
@@ -118,5 +120,9 @@ class ParcelCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _separator() {
+    return Text('•', style: TextStyle(color: AppColors.textSecondary));
   }
 }

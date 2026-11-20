@@ -4,13 +4,17 @@ import 'package:mail_tracking_service/models/parcel_carrier.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
 import 'package:mail_tracking_service/models/parcel_repository.dart';
 
-enum SortOrder { newFirst, oldFirst }
+enum SortOrder {
+  newFirst('Спочатку нові (за датою)'), oldFirst('Спочатку старі (за датою)');
+  final String label;
+  const SortOrder(this.label);
+}
 
 class ParcelProvider extends ChangeNotifier {
   String searchQuery;
   ParcelStatus? selectedStatus;
   ParcelCarrier? selectedCarrier;
-  SortOrder sortOrder;
+  SortOrder? sortOrder;
   int currentPage;
   int itemsPerPage;
 
@@ -20,7 +24,7 @@ class ParcelProvider extends ChangeNotifier {
     this.selectedCarrier,
     this.sortOrder = SortOrder.newFirst,
     this.currentPage = 1,
-    this.itemsPerPage = 5,
+    this.itemsPerPage = 4,
   });
 
   // Сеттери
@@ -42,7 +46,7 @@ class ParcelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSortOrder(SortOrder order) {
+  void setSortOrder(SortOrder? order) {
     sortOrder = order;
     currentPage = 1;
     notifyListeners();
