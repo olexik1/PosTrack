@@ -5,6 +5,7 @@ import 'package:mail_tracking_service/widgets/counter_card.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
 import 'package:mail_tracking_service/widgets/parcel_card.dart';
 import 'package:mail_tracking_service/models/parcel_provider.dart';
+import 'package:mail_tracking_service/models/current_parcel_provider.dart';
 import 'package:mail_tracking_service/widgets/search_field.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ParcelProvider>();
+    final parcelProvider = context.watch<ParcelProvider>();
+    final currentParcelProvider = context.read<CurrentParcelProvider>();
 
     return SingleChildScrollView(
       child: Padding(
@@ -42,8 +44,8 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(
                   width: 300,
                   child: SearchField(
-                      value: provider.searchQuery,
-                      onChanged: provider.setSearchQuery,
+                      value: parcelProvider.searchQuery,
+                      onChanged: parcelProvider.setSearchQuery,
                       onSubmitted: (_) => context.go('/parcels'),
                       color: Colors.white,
                       hintColor: AppColors.parcelInput
@@ -80,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           child: CounterCard(
                             status: s,
-                            count: provider.countByStatus(s),
+                            count: parcelProvider.countByStatus(s),
                           ),
                         ),
                     ],
@@ -100,7 +102,12 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 spacing: 8,
                 children: [
-                  for (final p in provider.recentParcels(3)) ParcelCard(parcel: p, onDetails: (){},),
+                  for (final p in parcelProvider.recentParcels(3)) ParcelCard(parcel: p,
+                    onDetails: () {
+                      currentParcelProvider.setNew(p.id);
+                      context.go('/parcel-details', extra: '/home');
+                    },
+                  ),
                 ],
               ),
             )

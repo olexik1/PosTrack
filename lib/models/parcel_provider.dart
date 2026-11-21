@@ -92,6 +92,8 @@ class ParcelProvider extends ChangeNotifier {
 
   // Геттери
   List<Parcel> get _parcels => ParcelRepository.getAll();
+  Parcel? getParcelByID(int? id) => (id == null) ? null :
+  ParcelRepository.getById(id);
 
   List<Parcel> get filteredParcels {
     final query = searchQuery.trim().toLowerCase();

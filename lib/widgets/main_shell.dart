@@ -5,6 +5,8 @@ import 'package:mail_tracking_service/theme/app_colors.dart';
 import 'package:mail_tracking_service/widgets/app_header.dart';
 import 'package:mail_tracking_service/services/auth_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:mail_tracking_service/models/current_parcel_provider.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -23,6 +25,7 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
     final selectedIndex = _selectedIndex(location);
+    final currentParcelProvider = context.read<CurrentParcelProvider>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -57,25 +60,37 @@ class MainShell extends StatelessWidget {
                         icon: Icons.home_outlined,
                         label: "Головна",
                         selected: (0 == selectedIndex),
-                        onTap: () => context.go("/home"),
+                        onTap: () {
+                          currentParcelProvider.remove();
+                          context.go("/home");
+                        },
                       ),
                       SideBarItem(
                         icon: Icons.inventory_2_outlined,
                         label: "Мої посилки",
                         selected: (1 == selectedIndex),
-                        onTap: () => context.go("/parcels"),
+                        onTap: () {
+                          currentParcelProvider.remove();
+                          context.go("/parcels");
+                          },
                       ),
                       SideBarItem(
                         icon: Icons.person_outline,
                         label: "Профіль",
                         selected: (2 == selectedIndex),
-                        onTap: () => context.go("/profile"),
+                        onTap: () {
+                          currentParcelProvider.remove();
+                          context.go("/profile");
+                          },
                       ),
                       SideBarItem(
                         icon: Icons.help_outline,
                         label: "Довідка",
                         selected: (3 == selectedIndex),
-                        onTap: () => context.go("/help"),
+                        onTap: () {
+                          currentParcelProvider.remove();
+                          context.go('/help');
+                        },
                         ),
                     ],
                   ),

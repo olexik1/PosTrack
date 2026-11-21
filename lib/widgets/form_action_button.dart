@@ -7,6 +7,10 @@ class FormActionButton extends StatelessWidget {
   final IconData? icon;
   final bool isLoading;
 
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final Color? borderColor;
+
   const FormActionButton({
     super.key,
     required this.label,
@@ -14,28 +18,41 @@ class FormActionButton extends StatelessWidget {
     this.fullWidth = true,
     this.icon,
     this.isLoading = false,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.borderColor
   });
 
   @override
   Widget build(BuildContext context) {
+    final buttonStyle = ElevatedButton.styleFrom(
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      minimumSize: Size(fullWidth ? double.infinity : 0, 48),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      side: borderColor != null
+          ? BorderSide(color: borderColor!)
+          : null,
+    );
+
+    final child = isLoading ? const SizedBox(
+      width: 20,
+      height: 20,
+      child: CircularProgressIndicator(strokeWidth: 2),
+    ) : Text(label);
+
     return SizedBox(
-      width: fullWidth ? double.infinity : null,
+        width: fullWidth ? double.infinity : null,
       child: (icon == null) ? ElevatedButton(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          minimumSize: Size(fullWidth ? double.infinity : 0, 48),
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-        ),
-        child: isLoading ? const CircularProgressIndicator() : Text(label),
+        style: buttonStyle,
+        child: child,
       ) : ElevatedButton.icon(
-          onPressed: isLoading ? null : onPressed,
-          style: ElevatedButton.styleFrom(
-            minimumSize: Size(fullWidth ? double.infinity : 0, 48),
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-          ),
-          label: isLoading ? const CircularProgressIndicator() : Text(label),
-          icon: Icon(icon, color: Colors.white),
-      ),
+        onPressed: isLoading ? null : onPressed,
+        style: buttonStyle,
+        label: child,
+        icon: Icon(icon),
+      )
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:mail_tracking_service/screens/home_screen.dart';
 import 'package:mail_tracking_service/screens/profile_screen.dart';
 import 'package:mail_tracking_service/screens/parcels_screen.dart';
 import 'package:mail_tracking_service/screens/change_password_screen.dart';
+import 'package:mail_tracking_service/screens/parcel_details_screen.dart';
 import 'package:mail_tracking_service/screens/help_screen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,6 +36,13 @@ final router = GoRouter(
           path: '/parcels',
           builder: (c, s) => const ParcelsScreen(),
         ),
+        GoRoute(path: '/parcel-details', builder: (c, s) {
+          final previousRoute = s.extra as String? ?? '/home';
+
+          return ParcelDetailsScreen(
+            previousDetailsRoute: previousRoute
+          );
+        }),
         GoRoute(path: '/help', builder: (c, s) => const HelpScreen()),
         GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
         GoRoute(path: '/profile/change-password', builder: (c, s) => const ChangePasswordScreen()),

@@ -9,6 +9,7 @@ import 'package:mail_tracking_service/widgets/filter_dropdown.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mail_tracking_service/models/parcel_provider.dart';
+import 'package:mail_tracking_service/models/current_parcel_provider.dart';
 import 'package:mail_tracking_service/widgets/search_field.dart';
 import 'package:mail_tracking_service/widgets/parcel_list_tile.dart';
 import 'package:mail_tracking_service/widgets/pagination_bar.dart';
@@ -18,7 +19,8 @@ class ParcelsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ParcelProvider>();
+    final parcelProvider = context.watch<ParcelProvider>();
+    final currentParcelProvider = context.watch<CurrentParcelProvider>();
 
     return SingleChildScrollView(
       child: Padding(
@@ -65,9 +67,9 @@ class ParcelsScreen extends StatelessWidget {
                 spacing: 16,
                 children: [
                   SearchField(
-                    value: provider.searchQuery,
-                    onChanged: provider.setSearchQuery,
-                    onSubmitted: provider.setSearchQuery,
+                    value: parcelProvider.searchQuery,
+                    onChanged: parcelProvider.setSearchQuery,
+                    onSubmitted: parcelProvider.setSearchQuery,
                     color: AppColors.photoButton,
                     hintColor: AppColors.textSecondary,
                   ),
@@ -76,34 +78,34 @@ class ParcelsScreen extends StatelessWidget {
                     children: [
                       FilterDropdown<ParcelStatus>(
                         label: 'Статус доставки',
-                        value: provider.selectedStatus,
+                        value: parcelProvider.selectedStatus,
                         options: {
                           null: 'Всі статуси',
                           for (final status in ParcelStatus.values)
                             status: status.label,
                         },
-                        onChanged: provider.setStatusFilter,
+                        onChanged: parcelProvider.setStatusFilter,
                       ),
                       FilterDropdown<ParcelCarrier>(
                         label: 'Перевізники',
-                        value: provider.selectedCarrier,
+                        value: parcelProvider.selectedCarrier,
                         options: {
                           null: 'Всі перевізники',
                           for (final carrier in ParcelCarrier.values)
                             carrier: carrier.label,
                         },
-                        onChanged: provider.setCarrierFilter,
+                        onChanged: parcelProvider.setCarrierFilter,
                       ),
                       FilterDropdown<SortOrder>(
                         label: 'Сортування',
-                        value: provider.sortOrder,
+                        value: parcelProvider.sortOrder,
                         options: {
                           for (final order in SortOrder.values)
                             order: order.label,
                         },
                         onChanged: (order) {
                           if (order != null) {
-                            provider.setSortOrder(order);
+                            parcelProvider.setSortOrder(order);
                           }
                         },
                       ),
@@ -112,7 +114,7 @@ class ParcelsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            if (provider.visibleParcels.isEmpty)
+            if (parcelProvider.visibleParcels.isEmpty)
               const Center(
                 child: Text('Посилок не знайдено'),
               )
@@ -120,23 +122,24 @@ class ParcelsScreen extends StatelessWidget {
               Column(
                 spacing: 8,
                 children: [
-                  for (final parcel in provider.visibleParcels)
+                  for (final parcel in parcelProvider.visibleParcels)
                     ParcelListTile(
                       parcel: parcel,
                       onDetails: () {
-                        // Перехід до деталей
+                        currentParcelProvider.setNew(parcel.id);
+                        context.go('/parcel-details', extra: '/parcels');
                       },
                     ),
                 ],
               ),
             PaginationBar(
-                currentPage: provider.currentPage,
-                totalPages: max(provider.totalPages, 1),
-                onPageChanged: provider.setCurrentPage,
-                elementsOnPage: provider.visibleParcels.length,
-                totalElements: provider.totalFilteredParcels,
-                onPrevious: provider.previousPage,
-                onNext: provider.nextPage
+                currentPage: parcelProvider.currentPage,
+                totalPages: max(parcelProvider.totalPages, 1),
+                onPageChanged: parcelProvider.setCurrentPage,
+                elementsOnPage: parcelProvider.visibleParcels.length,
+                totalElements: parcelProvider.totalFilteredParcels,
+                onPrevious: parcelProvider.previousPage,
+                onNext: parcelProvider.nextPage
             ),
           ],
         ),
