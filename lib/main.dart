@@ -10,6 +10,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:mail_tracking_service/secrets.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
     await SentryFlutter.init(
@@ -35,6 +37,10 @@ Future<void> main() async {
         await FirebaseAuth.instance.authStateChanges().first;
 
         setupAnalyticsTracking();
+
+        WidgetsFlutterBinding.ensureInitialized();
+        await initializeDateFormatting('uk', null);
+
         runApp(const MyApp());
       }
   );
