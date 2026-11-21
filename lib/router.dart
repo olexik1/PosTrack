@@ -9,6 +9,7 @@ import 'package:mail_tracking_service/screens/home_screen.dart';
 import 'package:mail_tracking_service/screens/profile_screen.dart';
 import 'package:mail_tracking_service/screens/parcels_screen.dart';
 import 'package:mail_tracking_service/screens/change_password_screen.dart';
+import 'package:mail_tracking_service/screens/help_screen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mail_tracking_service/utils/go_router_refresh_stream.dart';
@@ -34,6 +35,7 @@ final router = GoRouter(
           path: '/parcels',
           builder: (c, s) => const ParcelsScreen(),
         ),
+        GoRoute(path: '/help', builder: (c, s) => const HelpScreen()),
         GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
         GoRoute(path: '/profile/change-password', builder: (c, s) => const ChangePasswordScreen()),
         GoRoute(
