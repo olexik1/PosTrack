@@ -21,7 +21,7 @@ class NavTextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final button = TextButton.icon(
-      onPressed: () => context.push(destination),
+      onPressed: () => context.go(destination),
       style: TextButton.styleFrom(
         foregroundColor: AppColors.link,
         padding: EdgeInsets.zero,

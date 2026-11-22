@@ -26,7 +26,7 @@ class ParcelProvider extends ChangeNotifier {
     this.selectedCarrier,
     this.sortOrder = SortOrder.newFirst,
     this.currentPage = 1,
-    this.itemsPerPage = 4,
+    this.itemsPerPage = 3,
   });
 
   // Сеттери
@@ -314,5 +314,10 @@ class ParcelProvider extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  void deleteParcel(int id) {
+    ParcelRepository.removeById(id);
+    notifyListeners();
   }
 }

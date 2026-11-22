@@ -13,6 +13,10 @@ import 'package:mail_tracking_service/widgets/status_chip.dart';
 import 'package:mail_tracking_service/widgets/change_status_dialog.dart';
 import 'package:mail_tracking_service/utils/validators.dart';
 import 'package:mail_tracking_service/models/parcel_form_values.dart';
+import 'package:mail_tracking_service/widgets/delete_parcel_dialog.dart';
+import 'package:mail_tracking_service/widgets/parcel_photo_field.dart';
+import 'package:mail_tracking_service/widgets/parcel_photo_upload.dart';
+
 
 class ParcelFormScreen extends StatefulWidget {
   final Parcel? initial;
@@ -120,7 +124,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
             const TextSpan(text: ' *', style: TextStyle(color: AppColors.error)),
         ])),
         Container(
-          height: 56,
+          height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: AppColors.photoButton,
@@ -292,7 +296,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 16,
                         children: [
-                          Expanded(
+                          if(!_isEdit) Expanded(
                             child: FormInputField(
                               label: 'Дата відправлення',
                               hint: 'дд.мм.рррр',
@@ -326,10 +330,23 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                         isRequired: false,
                         fillColor: AppColors.photoButton,
                       ),
+                      if(_isEdit) const ParcelPhotoField(),
+                      if(!_isEdit) const ParcelPhotoUpload(),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: (!_isEdit) ? MainAxisAlignment.end :
+                        MainAxisAlignment.start,
                         spacing: 8,
                         children: [
+                          if(_isEdit) FormActionButton(
+                            label: "Видалити",
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.error,
+                            onPressed: () => showDeleteParcelDialog(context,
+                                parcelTitle: widget.initial?.title ?? "Без назви"),
+                            fullWidth: false,
+                            icon: Icons.delete_outline,
+                          ),
+                          const Spacer(),
                           TextButton(
                             onPressed: () => context.go(_backPath),
                             child: const Text('Скасувати'),

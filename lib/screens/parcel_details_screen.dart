@@ -30,6 +30,35 @@ class ParcelDetailsScreen extends StatelessWidget {
     final parcelProvider = context.watch<ParcelProvider>();
     final Parcel? parcel = parcelProvider.getParcelByID(parcelId);
 
+    Future<void> changeStatus(BuildContext context, Parcel parcel) async {
+      final result = await showChangeStatusDialog(
+        context,
+        currentStatus: parcel.status,
+      );
+
+      if (result == null || !context.mounted) return;
+
+      context.read<ParcelProvider>().changeStatus(
+        parcel.id,
+        result.status,
+        result.comment,
+      );
+    }
+
+    Future<void> deleteParcel(BuildContext context, Parcel parcel) async {
+      final confirmed = await showDeleteParcelDialog(
+        context,
+        parcelTitle: parcel.title,
+      );
+
+      if (!confirmed || !context.mounted) return;
+
+      context.read<ParcelProvider>().deleteParcel(parcel.id);
+
+      if (!context.mounted) return;
+      context.go('/parcels');
+    }
+
     return Padding(
         padding: EdgeInsets.symmetric(
           vertical: 16,
@@ -78,8 +107,9 @@ class ParcelDetailsScreen extends StatelessWidget {
                 children: [
                   FormActionButton(
                       label: "Змінити статус",
-                      onPressed: () => showChangeStatusDialog(context,
-                          currentStatus: parcel?.status ?? ParcelStatus.created),
+                    onPressed: parcel == null
+                        ? null
+                        : () => changeStatus(context, parcel),
                       fullWidth: false,
                       icon: Icons.access_time_outlined,
                   ),
@@ -95,8 +125,9 @@ class ParcelDetailsScreen extends StatelessWidget {
                     label: "Видалити",
                     backgroundColor: Colors.white,
                     foregroundColor: AppColors.error,
-                    onPressed: () => showDeleteParcelDialog(context,
-                        parcelTitle: parcel?.title ?? "Без назви"),
+                    onPressed: parcel == null
+                        ? null
+                        : () => deleteParcel(context, parcel),
                     fullWidth: false,
                     icon: Icons.delete_outline,
                   ),
