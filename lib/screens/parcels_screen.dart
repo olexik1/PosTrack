@@ -9,7 +9,6 @@ import 'package:mail_tracking_service/widgets/filter_dropdown.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:mail_tracking_service/models/parcel_provider.dart';
-import 'package:mail_tracking_service/models/current_parcel_provider.dart';
 import 'package:mail_tracking_service/widgets/search_field.dart';
 import 'package:mail_tracking_service/widgets/parcel_list_tile.dart';
 import 'package:mail_tracking_service/widgets/pagination_bar.dart';
@@ -47,9 +46,7 @@ class ParcelsScreen extends StatelessWidget {
                   height: 48,
                   child: FormActionButton(
                     label: "Нова посилка",
-                    onPressed: () {
-
-                    },
+                    onPressed: () => context.go('/parcels/new'),
                     fullWidth: false,
                     icon: Icons.add_outlined,
                   ),

@@ -87,9 +87,7 @@ class ParcelDetailsScreen extends StatelessWidget {
                     label: "Редагувати",
                     backgroundColor: Colors.white,
                     foregroundColor: AppColors.link,
-                    onPressed: () {
-
-                    },
+                    onPressed: () => context.go('/parcels/$parcelId/edit'),
                     fullWidth: false,
                     icon: Icons.edit_outlined,
                   ),

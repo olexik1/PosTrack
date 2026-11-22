@@ -40,6 +40,18 @@ final router = GoRouter(
           path: '/parcels',
           builder: (c, s) => const ParcelsScreen(),
         ),
+        GoRoute(
+          path: '/parcels/new',
+          builder: (c, s) => ParcelFormScreen(
+            onSubmit: (v) {
+              c.read<ParcelProvider>().addFromForm(v);
+              ScaffoldMessenger.of(c)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(AppSnackBar.success('Посилку додано'));
+              c.go('/parcels');
+            },
+          ),
+        ),
         GoRoute(path: '/parcels/:id', builder: (c, s) {
           final strId = s.pathParameters['id'];
           final intId = strId != null ? int.tryParse(strId) : null;
@@ -49,38 +61,26 @@ final router = GoRouter(
             parcelId: intId
           );
         }),
-        // GoRoute(
-        //   path: '/parcels/new',
-        //   builder: (c, s) => ParcelFormScreen(
-        //     onSubmit: (v) {
-        //       c.read<ParcelProvider>().addFromForm(v);
-        //       ScaffoldMessenger.of(c)
-        //         ..hideCurrentSnackBar()
-        //         ..showSnackBar(AppSnackBar.success('Посилку додано'));
-        //       c.go('/parcels');
-        //     },
-        //   ),
-        // ),
-        // GoRoute(
-        //   path: '/parcels/:id/edit',
-        //   builder: (c, s) {
-        //     final id = s.pathParameters['id']!;
-        //     final parcel = c.read<ParcelProvider>().byId(id);
-        //     if (parcel == null) {
-        //       return const Center(child: Text('Посилку не знайдено'));
-        //     }
-        //     return ParcelFormScreen(
-        //       initial: parcel,
-        //       onSubmit: (v) {
-        //         c.read<ParcelProvider>().updateFromForm(id, v);
-        //         ScaffoldMessenger.of(c)
-        //           ..hideCurrentSnackBar()
-        //           ..showSnackBar(AppSnackBar.success('Зміни збережено'));
-        //         c.go('/parcels/$id');
-        //       },
-        //     );
-        //   },
-        // ),
+        GoRoute(
+          path: '/parcels/:id/edit',
+          builder: (c, s) {
+            final id = s.pathParameters['id']!;
+            final parcel = c.read<ParcelProvider>().byId(id);
+            if (parcel == null) {
+              return const Center(child: Text('Посилку не знайдено'));
+            }
+            return ParcelFormScreen(
+              initial: parcel,
+              onSubmit: (v) {
+                c.read<ParcelProvider>().updateFromForm(id, v);
+                ScaffoldMessenger.of(c)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(AppSnackBar.success('Зміни збережено'));
+                c.go('/parcels/$id');
+              },
+            );
+          },
+        ),
         GoRoute(path: '/help', builder: (c, s) => const HelpScreen()),
         GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
         GoRoute(path: '/profile/change-password', builder: (c, s) => const ChangePasswordScreen()),

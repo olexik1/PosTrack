@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mail_tracking_service/models/parcel.dart';
 import 'package:mail_tracking_service/models/parcel_carrier.dart';
+import 'package:mail_tracking_service/models/parcel_form_values.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
 import 'package:mail_tracking_service/models/parcel_repository.dart';
+import 'package:mail_tracking_service/models/status_history.dart';
 
 enum SortOrder {
   newFirst('Спочатку нові (за датою)'), oldFirst('Спочатку старі (за датою)');
@@ -154,6 +156,163 @@ class ParcelProvider extends ChangeNotifier {
   }
 
   List<Parcel> recentParcels(int n) {
-    return _parcels.take(n).toList();
+    if (n <= 0) return [];
+
+    final parcels = [..._parcels];
+
+    parcels.sort((a, b) => b.date.compareTo(a.date));
+
+    return parcels.take(n).toList();
+  }
+
+  void changeStatus(int id, ParcelStatus status, String? comment) {
+    int index = _parcels.indexWhere((p) => p.id == id);
+
+    if(index != -1) {
+      Parcel copyParcel = _parcels[index];
+      List<StatusHistory> newStatusHistory;
+
+      if(copyParcel.statusHistory == null) {
+        newStatusHistory = [
+          StatusHistory(
+            status,
+            DateTime.now(),
+            comment
+          ),
+        ];
+      }
+      else {
+        newStatusHistory = [...copyParcel.statusHistory!];
+        newStatusHistory.add(
+          StatusHistory(
+              status,
+              DateTime.now(),
+              comment
+          ),
+        );
+      }
+
+      Parcel newParcel = Parcel(
+        copyParcel.id,
+        copyParcel.title,
+        copyParcel.trackingNumber,
+        copyParcel.carrier,
+        status,
+        copyParcel.date,
+        copyParcel.sender,
+        copyParcel.recipient,
+        copyParcel.note,
+        newStatusHistory
+      );
+
+      ParcelRepository.updateParcel(newParcel);
+      notifyListeners();
+    }
+  }
+
+  bool isTrackingNumberTaken(String trackingNumber, {int? excludeId}) {
+    Parcel? parcel = _parcels.where((p) =>
+    (p.trackingNumber == trackingNumber) && (p.id != excludeId)).firstOrNull;
+
+    return (parcel == null) ? false : true;
+  }
+
+  void addFromForm(ParcelFormValues values) {
+    int biggestId;
+
+    if(_parcels.isEmpty) {
+      biggestId = 1;
+    }
+    else {
+      biggestId = _parcels.reduce((a, b) => a.id < b.id ? b : a).id;
+    }
+
+    List<StatusHistory> newStatusHistory = [
+      StatusHistory(
+          values.status,
+          DateTime.now(),
+      ),
+    ];
+
+    Parcel newParcel = Parcel(
+        biggestId + 1,
+        values.title,
+        values.trackingNumber,
+        values.carrier,
+        values.status,
+        values.date,
+        values.sender,
+        values.recipient,
+        values.note,
+        newStatusHistory
+    );
+
+    ParcelRepository.addParcel(newParcel);
+    notifyListeners();
+  }
+
+  Parcel? byId(String strId) {
+    int? intId;
+
+    if(strId == "") {
+      return null;
+    } else {
+      intId = int.tryParse(strId);
+    }
+
+    if(intId == null) {
+      return null;
+    } else {
+      return ParcelRepository.getById(intId);
+    }
+  }
+
+  void updateFromForm(String strId, ParcelFormValues values) {
+    int? intId = strId != "" ? int.tryParse(strId) : null;
+
+    if(intId != null) {
+      Parcel? findParcel = getParcelByID(intId);
+
+      if(findParcel != null) {
+        List<StatusHistory>? newStatusHistory = findParcel.statusHistory;
+
+        if(values.status != findParcel.status) {
+          if(findParcel.statusHistory == null) {
+            newStatusHistory = [
+              StatusHistory(
+                values.status,
+                DateTime.now(),
+              ),
+            ];
+          }
+          else {
+            newStatusHistory = [...findParcel.statusHistory!];
+            newStatusHistory.add(
+              StatusHistory(
+                  values.status,
+                  DateTime.now(),
+                  ""
+              ),
+            );
+          }
+        }
+
+        Parcel newParcel = Parcel(
+            findParcel.id,
+            values.title,
+            values.trackingNumber,
+            values.carrier,
+            values.status,
+            values.date,
+            values.sender,
+            values.recipient,
+            values.note,
+            newStatusHistory
+        );
+
+        ParcelRepository.updateParcel(newParcel);
+        notifyListeners();
+      }
+    }
   }
 }

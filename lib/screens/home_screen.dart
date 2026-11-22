@@ -5,7 +5,6 @@ import 'package:mail_tracking_service/widgets/counter_card.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
 import 'package:mail_tracking_service/widgets/parcel_card.dart';
 import 'package:mail_tracking_service/models/parcel_provider.dart';
-import 'package:mail_tracking_service/models/current_parcel_provider.dart';
 import 'package:mail_tracking_service/widgets/search_field.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -54,9 +53,7 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 48,
                 child: FormActionButton(
                     label: "Додати посилку",
-                    onPressed: () {
-                      // Sentry.captureException(Exception('Тестова помилка PosTrack'));
-                    },
+                    onPressed: () => context.go('/parcels/new'),
                     fullWidth: false,
                     icon: Icons.add_outlined,
                   ),

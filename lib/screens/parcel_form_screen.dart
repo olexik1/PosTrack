@@ -12,28 +12,7 @@ import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
 import 'package:mail_tracking_service/widgets/status_chip.dart';
 import 'package:mail_tracking_service/widgets/change_status_dialog.dart';
 import 'package:mail_tracking_service/utils/validators.dart';
-
-class ParcelFormValues {
-  final String title;
-  final String trackingNumber;
-  final ParcelCarrier carrier;
-  final String sender;
-  final String recipient;
-  final DateTime date;
-  final ParcelStatus status;
-  final String note;
-
-  const ParcelFormValues({
-    required this.title,
-    required this.trackingNumber,
-    required this.carrier,
-    required this.sender,
-    required this.recipient,
-    required this.date,
-    required this.status,
-    required this.note,
-  });
-}
+import 'package:mail_tracking_service/models/parcel_form_values.dart';
 
 class ParcelFormScreen extends StatefulWidget {
   final Parcel? initial;
@@ -105,10 +84,10 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
     final result =
     await showChangeStatusDialog(context, currentStatus: _status);
     if (result == null || !mounted) return;
-    // context
-    //     .read<ParcelProvider>()
-    //     .changeStatus(widget.initial!.id, result.status, result.comment);
-    // setState(() => _status = result.status);
+    context
+        .read<ParcelProvider>()
+        .changeStatus(widget.initial!.id, result.status, result.comment);
+    setState(() => _status = result.status);
   }
 
   void _submit() {
@@ -258,16 +237,16 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                               controller: _tracking,
                               fillColor: AppColors.photoButton,
                               validator: (v) {
-                                // final base = Validators.validateRequired(
-                                //     v, 'Введіть трек-номер');
-                                // if (base != null) return base;
-                                // final taken = context
-                                //     .read<ParcelProvider>()
-                                //     .isTrackingNumberTaken(v!.trim(),
-                                //     excludeId: widget.initial?.id);
-                                // return taken
-                                //     ? 'Посилка з таким трек-номером вже існує'
-                                //     : null;
+                                final base = Validators.validateRequired(
+                                    v, 'Введіть трек-номер');
+                                if (base != null) return base;
+                                final taken = context
+                                    .read<ParcelProvider>()
+                                    .isTrackingNumberTaken(v!.trim(),
+                                    excludeId: widget.initial?.id);
+                                return taken
+                                    ? 'Посилка з таким трек-номером вже існує'
+                                    : null;
                                 return null;
                               },
                             ),
