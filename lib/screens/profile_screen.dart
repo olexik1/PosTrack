@@ -4,11 +4,12 @@ import 'package:mail_tracking_service/widgets/form_input_field.dart';
 import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/widgets/profile_action_card.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mail_tracking_service/services/auth_repository.dart';
 import 'package:mail_tracking_service/exceptions/auth_exception.dart';
 import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
 import 'package:mail_tracking_service/utils/validators.dart';
 import 'package:mail_tracking_service/widgets/avatar_picker_dialog.dart';
+import 'package:mail_tracking_service/models/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,16 +19,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final AuthRepository _authRepository = AuthRepository();
-
   late String _savedName;
   late String _savedEmail;
   String? _photoUrl;
 
   late TextEditingController _nameEditingController;
   late TextEditingController _emailAccessController;
-
-  bool _isLoading = false;
 
   final GlobalKey<FormState> _nameFormKey = GlobalKey<FormState>();
 
@@ -38,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
-    final user = _authRepository.currentUser;
+    final user = context.read<AppAuthProvider>().user;
     _savedName = user?.displayName ?? '';
     _savedEmail = user?.email ?? '';
     final photo = user?.photoURL;
@@ -63,8 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _changePhoto(String? url) async {
     try {
-      setState(() => _isLoading = true);
-      await _authRepository.updatePhoto(photoUrl: url);
+      await context.read<AppAuthProvider>().updatePhoto(photoUrl: url);
       if (!mounted) return;
       setState(() => _photoUrl = url);
       _showSnack(AppSnackBar.success(url == null ? 'Фото видалено' : 'Фото оновлено'));
@@ -74,13 +70,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       _showSnack(AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AppAuthProvider>();
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.symmetric(
@@ -140,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     SizedBox(
                                       height: 40,
                                       child: ElevatedButton.icon(
-                                        onPressed: _isLoading
+                                        onPressed: authProvider.isLoading
                                             ? null
                                             : () async {
                                           final url = await showAvatarPicker(context, selectedUrl: _photoUrl);
@@ -158,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     SizedBox(
                                       height: 40,
                                       child: TextButton(
-                                        onPressed: (_isLoading || _photoUrl == null) ? null : () => _changePhoto(null),
+                                        onPressed: (authProvider.isLoading || _photoUrl == null) ? null : () => _changePhoto(null),
                                         child: const Text(
                                           "Видалити",
                                           style: TextStyle(color: AppColors.hint),
@@ -187,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         controller: _nameEditingController,
                         fillColor: AppColors.photoButton,
                         fieldHeight: 56,
-                        enabled: !_isLoading,
+                        enabled: !authProvider.isLoading,
                         validator: (value) => Validators.validateRequired(value, "Введіть ім'я"),
                       ),
                     ),
@@ -227,11 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           final name = _nameEditingController.text.trim();
 
                           try {
-                            setState(() {
-                              _isLoading = true;
-                            });
-
-                            await _authRepository.updateName(name: name);
+                            await authProvider.updateName(name: name);
 
                             if (!context.mounted) return;
 
@@ -243,8 +235,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               AppSnackBar.success('Зміни збережено'),
                             );
-
-                            // context.go('/home');
                           } on AuthException catch(e) {
                             if(!context.mounted) return;
 
@@ -261,17 +251,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'),
                             );
-                          } finally {
-                            if (context.mounted) {
-                              setState(() {
-                                _isLoading = false;
-                              });
-                            }
                           }
                         }
                       },
                       fullWidth: false,
-                      isLoading: _isLoading,
+                      isLoading: authProvider.isLoading,
                     ),
                     const Divider(height: 1),
                     const Text(
@@ -296,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: "Активна сесія",
                       subTitle: "Завершити роботу на цьому пристрої",
                       actionLabel: "Вийти з акаунту",
-                      onAction: () =>  _authRepository.signOut(),
+                      onAction: () =>  authProvider.signOut(),
                       btnTextColor: AppColors.exit,
                       iconBackground: AppColors.exitBackground,
                       iconColor: AppColors.exit,

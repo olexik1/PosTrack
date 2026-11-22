@@ -3,15 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:mail_tracking_service/widgets/side_bar_item.dart';
 import 'package:mail_tracking_service/theme/app_colors.dart';
 import 'package:mail_tracking_service/widgets/app_header.dart';
-import 'package:mail_tracking_service/services/auth_repository.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mail_tracking_service/models/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
-  final AuthRepository _authRepository = AuthRepository();
 
-  MainShell({super.key, required this.child});
+  const MainShell({super.key, required this.child});
 
   static const _routes = ['/home', '/parcels', '/profile', '/help'];
 
@@ -22,6 +20,11 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AppAuthProvider>();
+    final user = authProvider.user;
+    final displayName = user?.displayName ?? user?.email ?? 'Користувач';
+    final photo = user?.photoURL;
+
     final location = GoRouterState.of(context).matchedLocation;
     final selectedIndex = _selectedIndex(location);
 
@@ -88,22 +91,13 @@ class MainShell extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                StreamBuilder<User?>(
-                  stream: _authRepository.userChanges,
-                  builder: (context, snapshot) {
-                    final user = snapshot.data;
-                    final displayName = user?.displayName ?? user?.email ?? 'Користувач';
-                    final photo = user?.photoURL;
-
-                    return AppHeader(
-                      name: displayName,
-                      photoUrl: (photo == null || photo.isEmpty) ? null : photo,
-                      onLogout: () async {
-                          await _authRepository.signOut();
-                          if (context.mounted) context.go('/login');
-                        },
-                      );
-                    },
+                AppHeader(
+                  name: displayName,
+                  photoUrl: (photo == null || photo.isEmpty) ? null : photo,
+                  onLogout: () async {
+                    await authProvider.signOut();
+                    if (context.mounted) context.go('/login');
+                  },
                 ),
                 Expanded(child: child),
               ],

@@ -7,9 +7,10 @@ import 'package:mail_tracking_service/utils/validators.dart';
 import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
 import 'package:mail_tracking_service/exceptions/auth_exception.dart';
-import 'package:mail_tracking_service/services/auth_repository.dart';
 import 'package:mail_tracking_service/theme/app_colors.dart';
 import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
+import 'package:mail_tracking_service/models/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 
 class ForgotPasswordScreen extends StatelessWidget {
@@ -31,8 +32,6 @@ class PasswordRecoveryForm extends StatefulWidget {
 class _PasswordRecoveryFormState extends State<PasswordRecoveryForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final AuthRepository _authRepository = AuthRepository();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -42,6 +41,8 @@ class _PasswordRecoveryFormState extends State<PasswordRecoveryForm> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AppAuthProvider>();
+
     return Form(
       key: _formKey,
       child: Column(
@@ -59,21 +60,17 @@ class _PasswordRecoveryFormState extends State<PasswordRecoveryForm> {
             controller: _emailController,
             validator: (value) => Validators.validateEmail(value),
             labelTrailing: null,
-            enabled: !_isLoading,
+            enabled: !authProvider.isLoading,
           ),
           FormActionButton(
             label: 'Надіслати лист',
-            isLoading: _isLoading,
+            isLoading: authProvider.isLoading,
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 final email = _emailController.text.trim();
 
                 try {
-                  setState(() {
-                    _isLoading = true;
-                  });
-
-                  await _authRepository.sendPasswordReset(email: email);
+                  await authProvider.sendPasswordReset(email: email);
 
                   if (!context.mounted) return;
                   context.go(Uri(path: '/letter-sent',
@@ -94,12 +91,6 @@ class _PasswordRecoveryFormState extends State<PasswordRecoveryForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'),
                   );
-                } finally {
-                  if (context.mounted) {
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  }
                 }
               }
             },

@@ -4,10 +4,11 @@ import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
 import 'package:mail_tracking_service/widgets/form_input_field.dart';
 import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/theme/app_colors.dart';
-import 'package:mail_tracking_service/services/auth_repository.dart';
 import 'package:mail_tracking_service/exceptions/auth_exception.dart';
 import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
 import 'package:mail_tracking_service/utils/validators.dart';
+import 'package:mail_tracking_service/models/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -17,13 +18,9 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  final AuthRepository _authRepository = AuthRepository();
-
   late TextEditingController _passwordController;
   late TextEditingController _newPasswordController;
   late TextEditingController _confPasswordController;
-
-  bool _isLoading = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -45,6 +42,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AppAuthProvider>();
+
     return Padding(
         padding: EdgeInsets.symmetric(
           vertical: 16,
@@ -105,7 +104,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       fieldHeight: 56,
                       isRequired: true,
                       validator: (v) => Validators.validateRequired(v),
-                      enabled: !_isLoading,
+                      enabled: !authProvider.isLoading,
                     ),
                     FormInputField(
                       hint: "******",
@@ -116,7 +115,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       fieldHeight: 56,
                       isRequired: true,
                       validator: (v) => Validators.validatePassword(v),
-                      enabled: !_isLoading,
+                      enabled: !authProvider.isLoading,
                     ),
                     FormInputField(
                       hint: "******",
@@ -127,25 +126,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       fieldHeight: 56,
                       isRequired: true,
                       validator: (v) => Validators.validateConfirm(v, _newPasswordController),
-                      enabled: !_isLoading,
+                      enabled: !authProvider.isLoading,
                     ),
                     Row(
                       spacing: 8,
                       children: [
                         FormActionButton(
                           label: "Змінити пароль",
-                          isLoading: _isLoading,
+                          isLoading: authProvider.isLoading,
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               final currentPassword = _passwordController.text;
                               final newPassword = _newPasswordController.text;
 
                               try {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-
-                                await _authRepository.changePassword(
+                                await authProvider.changePassword(
                                     currentPassword: currentPassword,
                                     newPassword: newPassword
                                 );
@@ -175,12 +170,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'),
                                 );
-                              } finally {
-                                if (context.mounted) {
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                }
                               }
                             }
                           },

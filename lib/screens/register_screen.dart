@@ -8,9 +8,9 @@ import 'package:mail_tracking_service/widgets/form_title.dart';
 import 'package:mail_tracking_service/utils/validators.dart';
 import 'package:mail_tracking_service/widgets/bottom_redirection.dart';
 import 'package:mail_tracking_service/exceptions/auth_exception.dart';
-import 'package:mail_tracking_service/services/auth_repository.dart';
 import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
-
+import 'package:mail_tracking_service/models/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -34,8 +34,6 @@ class _RegisterFormState extends State<RegisterForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
-  final AuthRepository _authRepository = AuthRepository();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -48,6 +46,8 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AppAuthProvider>();
+
     return Form(
       key: _formKey,
       child: Column(
@@ -64,7 +64,7 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: _nameController,
             validator: (value) => Validators.validateRequired(value),
             labelTrailing: null,
-            enabled: !_isLoading,
+            enabled: !authProvider.isLoading,
           ),
           FormInputField(
             label: "Email",
@@ -73,7 +73,7 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: _emailController,
             validator: (value) => Validators.validateEmail(value),
             labelTrailing: null,
-            enabled: !_isLoading,
+            enabled: !authProvider.isLoading,
           ),
           FormInputField(
             label: "Пароль",
@@ -82,7 +82,7 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: _passwordController,
             validator: (value) => Validators.validatePassword(value),
             labelTrailing: null,
-            enabled: !_isLoading,
+            enabled: !authProvider.isLoading,
           ),
           FormInputField(
             label: "Підтвердіть пароль",
@@ -91,11 +91,11 @@ class _RegisterFormState extends State<RegisterForm> {
             controller: _confirmPasswordController,
             validator: (v) => Validators.validateConfirm(v, _passwordController),
             labelTrailing: null,
-            enabled: !_isLoading,
+            enabled: !authProvider.isLoading,
           ),
           FormActionButton(
             label: 'Зареєструватися',
-            isLoading: _isLoading,
+            isLoading: authProvider.isLoading,
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 final email = _emailController.text.trim();
@@ -103,11 +103,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 final name = _nameController.text.trim();
 
                 try {
-                  setState(() {
-                    _isLoading = true;
-                  });
-
-                  await _authRepository.signUp(email: email, password: password,
+                  await authProvider.signUp(email: email, password: password,
                       name: name);
 
                   if (!context.mounted) return;
@@ -128,12 +124,6 @@ class _RegisterFormState extends State<RegisterForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     AppSnackBar.error('Не вдалося виконати операцію. Спробуйте ще раз'),
                   );
-                } finally {
-                  if (context.mounted) {
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  }
                 }
               }
             },

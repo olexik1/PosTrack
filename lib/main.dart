@@ -11,6 +11,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:mail_tracking_service/secrets.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mail_tracking_service/models/auth_provider.dart';
+import 'package:mail_tracking_service/services/auth_repository.dart';
 
 Future<void> main() async {
     await SentryFlutter.init(
@@ -50,8 +52,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ParcelProvider(),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => ParcelProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => AppAuthProvider(AuthRepository()),
+          ),
+        ],
       child: MaterialApp.router(
         theme: AppTheme.light,
         routerConfig: router,
