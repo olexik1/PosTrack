@@ -17,7 +17,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parcelProvider = context.watch<ParcelProvider>();
-    final currentParcelProvider = context.read<CurrentParcelProvider>();
 
     return SingleChildScrollView(
       child: Padding(
@@ -104,8 +103,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   for (final p in parcelProvider.recentParcels(3)) ParcelCard(parcel: p,
                     onDetails: () {
-                      currentParcelProvider.setNew(p.id);
-                      context.go('/parcel-details', extra: '/home');
+                      context.go('/parcels/${p.id}');
                     },
                   ),
                 ],

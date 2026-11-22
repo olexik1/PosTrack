@@ -20,7 +20,6 @@ class ParcelsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parcelProvider = context.watch<ParcelProvider>();
-    final currentParcelProvider = context.watch<CurrentParcelProvider>();
 
     return SingleChildScrollView(
       child: Padding(
@@ -126,8 +125,7 @@ class ParcelsScreen extends StatelessWidget {
                     ParcelListTile(
                       parcel: parcel,
                       onDetails: () {
-                        currentParcelProvider.setNew(parcel.id);
-                        context.go('/parcel-details', extra: '/parcels');
+                        context.go('/parcels/${parcel.id}');
                       },
                     ),
                 ],

@@ -14,6 +14,10 @@ import 'package:mail_tracking_service/screens/help_screen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mail_tracking_service/utils/go_router_refresh_stream.dart';
+import 'package:mail_tracking_service/screens/parcel_form_screen.dart';
+import 'package:mail_tracking_service/widgets/app_snack_bar.dart';
+import 'package:mail_tracking_service/models/parcel_provider.dart';
+import 'package:provider/provider.dart';
 
 final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
@@ -36,20 +40,50 @@ final router = GoRouter(
           path: '/parcels',
           builder: (c, s) => const ParcelsScreen(),
         ),
-        GoRoute(path: '/parcel-details', builder: (c, s) {
-          final previousRoute = s.extra as String? ?? '/home';
+        GoRoute(path: '/parcels/:id', builder: (c, s) {
+          final strId = s.pathParameters['id'];
+          final intId = strId != null ? int.tryParse(strId) : null;
 
           return ParcelDetailsScreen(
-            previousDetailsRoute: previousRoute
+            previousDetailsRoute: '/parcels',
+            parcelId: intId
           );
         }),
+        // GoRoute(
+        //   path: '/parcels/new',
+        //   builder: (c, s) => ParcelFormScreen(
+        //     onSubmit: (v) {
+        //       c.read<ParcelProvider>().addFromForm(v);
+        //       ScaffoldMessenger.of(c)
+        //         ..hideCurrentSnackBar()
+        //         ..showSnackBar(AppSnackBar.success('Посилку додано'));
+        //       c.go('/parcels');
+        //     },
+        //   ),
+        // ),
+        // GoRoute(
+        //   path: '/parcels/:id/edit',
+        //   builder: (c, s) {
+        //     final id = s.pathParameters['id']!;
+        //     final parcel = c.read<ParcelProvider>().byId(id);
+        //     if (parcel == null) {
+        //       return const Center(child: Text('Посилку не знайдено'));
+        //     }
+        //     return ParcelFormScreen(
+        //       initial: parcel,
+        //       onSubmit: (v) {
+        //         c.read<ParcelProvider>().updateFromForm(id, v);
+        //         ScaffoldMessenger.of(c)
+        //           ..hideCurrentSnackBar()
+        //           ..showSnackBar(AppSnackBar.success('Зміни збережено'));
+        //         c.go('/parcels/$id');
+        //       },
+        //     );
+        //   },
+        // ),
         GoRoute(path: '/help', builder: (c, s) => const HelpScreen()),
         GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
         GoRoute(path: '/profile/change-password', builder: (c, s) => const ChangePasswordScreen()),
-        GoRoute(
-          path: '/help',
-          builder: (c, s) => const Center(child: Text('Довідка: скоро')),
-        ),
       ],
     ),
   ],

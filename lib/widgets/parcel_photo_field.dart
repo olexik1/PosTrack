@@ -109,7 +109,6 @@ class ParcelPhotoField extends StatelessWidget {
       ),
       child: const Text(
         'Додати',
-        style: TextStyle(fontWeight: FontWeight.w600),
       ),
     );
   }

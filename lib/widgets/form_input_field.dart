@@ -14,6 +14,9 @@ class FormInputField extends StatefulWidget {
   final Color? fillColor;
   final bool enabled;
   final double? fieldHeight;
+  final int maxLines;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const FormInputField({
     super.key,
@@ -27,6 +30,9 @@ class FormInputField extends StatefulWidget {
     this.fillColor,
     this.enabled = true,
     this.fieldHeight,
+    this.maxLines = 1,
+    this.readOnly = false,
+    this.onTap
   });
 
   @override
@@ -101,6 +107,10 @@ class _FormInputFieldState extends State<FormInputField> {
           obscureText: _obscure,
           keyboardType: keyboard,
           enabled: widget.enabled,
+          maxLines: _obscure ? 1 : widget.maxLines,
+          minLines: widget.maxLines > 1 ? 3 : null,
+          readOnly: widget.readOnly,
+          onTap: widget.onTap,
           decoration: InputDecoration(
             hintText: widget.hint,
             filled: widget.fillColor != null,

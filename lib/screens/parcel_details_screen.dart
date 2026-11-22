@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mail_tracking_service/widgets/change_status_dialog.dart';
+import 'package:mail_tracking_service/widgets/delete_parcel_dialog.dart';
 import 'package:mail_tracking_service/widgets/nav_textbutton.dart';
 import 'package:mail_tracking_service/widgets/form_action_button.dart';
 import 'package:mail_tracking_service/models/parcel_provider.dart';
 import 'package:mail_tracking_service/models/parcel.dart';
 import 'package:mail_tracking_service/models/parcel_status.dart';
-import 'package:mail_tracking_service/models/current_parcel_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:mail_tracking_service/widgets/status_chip.dart';
 import 'package:mail_tracking_service/widgets/info_field.dart';
@@ -17,13 +18,17 @@ import 'package:mail_tracking_service/widgets/status_circle.dart';
 
 class ParcelDetailsScreen extends StatelessWidget {
   final String previousDetailsRoute;
-  const ParcelDetailsScreen({super.key, required this.previousDetailsRoute});
+  final int? parcelId;
+  const ParcelDetailsScreen({
+    super.key,
+    required this.previousDetailsRoute,
+    required this.parcelId
+  });
 
   @override
   Widget build(BuildContext context) {
     final parcelProvider = context.watch<ParcelProvider>();
-    final currentParcelProvider = context.watch<CurrentParcelProvider>();
-    final Parcel? parcel = parcelProvider.getParcelByID(currentParcelProvider.currentParcelId);
+    final Parcel? parcel = parcelProvider.getParcelByID(parcelId);
 
     return Padding(
         padding: EdgeInsets.symmetric(
@@ -31,7 +36,7 @@ class ParcelDetailsScreen extends StatelessWidget {
           horizontal: 48,
         ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 24,
         children: [
           Padding(
@@ -73,9 +78,8 @@ class ParcelDetailsScreen extends StatelessWidget {
                 children: [
                   FormActionButton(
                       label: "Змінити статус",
-                      onPressed: () {
-
-                      },
+                      onPressed: () => showChangeStatusDialog(context,
+                          currentStatus: parcel?.status ?? ParcelStatus.created),
                       fullWidth: false,
                       icon: Icons.access_time_outlined,
                   ),
@@ -93,9 +97,8 @@ class ParcelDetailsScreen extends StatelessWidget {
                     label: "Видалити",
                     backgroundColor: Colors.white,
                     foregroundColor: AppColors.error,
-                    onPressed: () {
-
-                    },
+                    onPressed: () => showDeleteParcelDialog(context,
+                        parcelTitle: parcel?.title ?? "Без назви"),
                     fullWidth: false,
                     icon: Icons.delete_outline,
                   ),
